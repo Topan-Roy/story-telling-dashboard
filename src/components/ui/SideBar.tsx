@@ -11,8 +11,22 @@ import TransactionIcon from '../svgs/TransactionIcon';
 import FAQIcon from '../svgs/FAQIcon';
 import AdminAccountIcon from '../svgs/AdminAccountIcon';
 import { AdminRoutes } from '@/App';
+import { useContext } from "react";
+
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from '@/Context/AuthProvider';
 
 export default function SideBar() {
+    const { logOut,user } = useContext(AuthContext)!;
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        
+        await logOut();
+        navigate("/", { replace: true });
+     
+    };
+
     const { pathname } = useLocation()
     return (
         <>
@@ -41,10 +55,14 @@ export default function SideBar() {
                         <Avatar color={pathname === AdminRoutes.AvartarManagement ? "#9458E8" : "#4B5563"} />
                         <Link to={`/dashboard/avatar-management`} className={`${pathname === AdminRoutes.AvartarManagement ? "text-[#9458E8]" : "#4B5563"}`}>Avatar Management</Link>
                     </li>
+
+
                     <li className={`${pathname === AdminRoutes.LLMPrompts ? "list-link" : ""} flex items-center justify-start gap-3 py-[12px] px-[28px] inter-font font-[500] text-[13.6px] leading-[24px]`}>
                         <LLMIcon color={pathname === AdminRoutes.LLMPrompts ? "#9458E8" : "#4B5563"} />
                         <Link to={`/dashboard/llm-prompts`} className={`${pathname === AdminRoutes.LLMPrompts ? "text-[#9458E8]" : "#4B5563"}`}>LLM Prompts</Link>
                     </li>
+
+
                     <li className={`${pathname === AdminRoutes.CoinManagementPackage || pathname === AdminRoutes.CoinManagementAnalytics ? "list-link" : ""
                         } flex items-center justify-start gap-3 py-[12px] px-[28px] inter-font font-[500] text-[13.6px] leading-[24px]`}>
                         <CoinIcon color={
@@ -54,9 +72,8 @@ export default function SideBar() {
                             `${pathname === AdminRoutes.CoinManagementPackage || pathname === AdminRoutes.CoinManagementAnalytics ? "text-[#9458E8]" : "#4B5563"}`
                         }>Coin Management</Link>
                     </li>
-                    <li className={`${
-                        pathname === AdminRoutes.SubscriptionManagementPackage || pathname === AdminRoutes.SubscriptionManagementAnalytics ? "list-link" : ""
-                    } flex items-center justify-start gap-3 py-[12px] px-[28px] inter-font font-[500] text-[13.6px] leading-[24px]`}>
+                    <li className={`${pathname === AdminRoutes.SubscriptionManagementPackage || pathname === AdminRoutes.SubscriptionManagementAnalytics ? "list-link" : ""
+                        } flex items-center justify-start gap-3 py-[12px] px-[28px] inter-font font-[500] text-[13.6px] leading-[24px]`}>
                         <SubscriptionIcon color={
                             pathname === AdminRoutes.SubscriptionManagementPackage || pathname === AdminRoutes.SubscriptionManagementAnalytics ? "#9458E8" : "#4B5563"
                         } />
@@ -64,15 +81,13 @@ export default function SideBar() {
                             `${pathname === AdminRoutes.SubscriptionManagementPackage || pathname === AdminRoutes.SubscriptionManagementAnalytics ? "text-[#9458E8]" : "#4B5563"}`
                         }>Subscriptions</Link>
                     </li>
-                    <li className={`${
-                            pathname === AdminRoutes.ReportAndAnalytics || pathname === AdminRoutes.ApiCostAnalytics || pathname === AdminRoutes.CostVsRevenue ? "list-link" : ""
+                    <li className={`${pathname === AdminRoutes.ReportAndAnalytics || pathname === AdminRoutes.ApiCostAnalytics || pathname === AdminRoutes.CostVsRevenue ? "list-link" : ""
                         } flex items-center justify-start gap-3 py-[12px] px-[28px] inter-font font-[500] text-[13.6px] leading-[24px]`}>
                         <Report_Analytics color={
                             pathname === AdminRoutes.ReportAndAnalytics || pathname === AdminRoutes.ApiCostAnalytics || pathname === AdminRoutes.CostVsRevenue ? "#9458E8" : "#4B5563"
                         } />
-                        <Link to={`/dashboard/report-and-analytics`} className={`${
-                            pathname === AdminRoutes.ReportAndAnalytics || pathname === AdminRoutes.ApiCostAnalytics || pathname === AdminRoutes.CostVsRevenue ? "text-[#9458E8]" : "#4B5563"
-                        }`}>Reports & Analytics</Link>
+                        <Link to={`/dashboard/report-and-analytics`} className={`${pathname === AdminRoutes.ReportAndAnalytics || pathname === AdminRoutes.ApiCostAnalytics || pathname === AdminRoutes.CostVsRevenue ? "text-[#9458E8]" : "#4B5563"
+                            }`}>Reports & Analytics</Link>
                     </li>
                     <li className={`${pathname === AdminRoutes.TransactionHistory ? "list-link" : ""} flex items-center justify-start gap-3 py-[12px] px-[28px] inter-font font-[500] text-[13.6px] leading-[24px]`}>
                         <TransactionIcon color={pathname === AdminRoutes.TransactionHistory ? "#9458E8" : "#4B5563"} />
@@ -146,9 +161,13 @@ export default function SideBar() {
                     </div>
                     <div className="flex items-center justify-center flex-col gap-[-5px]">
                         <p className="font-[500] text-[11.9px] leading-[20px] inter-font">Admin</p>
-                        <button className="font-[400] text-[#6B7280] text-[10.2px] leading-[16px] cursor-pointer">
+                        <button
+                            onClick={handleLogout}
+                            className="font-[400] text-[#6B7280] text-[10.2px] leading-[16px] hover:text-red-500"
+                        >
                             Logout
                         </button>
+
                     </div>
                 </div>
             </nav>

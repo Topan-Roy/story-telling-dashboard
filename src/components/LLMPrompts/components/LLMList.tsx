@@ -20,7 +20,7 @@ export default function LLMList({ block }: { block: any }) {
                 }
             </td>
             <td className='text-[14px] leading-[20px] text-[#333333] text-left p-[10px] border-b-[0.5px] border-[#EBEBEB]'>{block.date_added}</td>
-            <td className='text-[14px] leading-[20px] text-[#333333] text-left p-[10px] border-b-[0.5px] border-[#EBEBEB] flex items-baseline justify-start gap-[8px]'>
+            <td className='text-[14px] leading-[20px] text-[#333333] text-left p-[12px] border-b-[0.5px] border-[#EBEBEB] flex items-baseline justify-start gap-[8px]'>
                 <div onClick={() => setShowUpdate(true)}><EditIcon /></div>
                 <div><DeleteIcon /></div>
             </td>

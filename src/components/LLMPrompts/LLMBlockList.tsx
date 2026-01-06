@@ -1,50 +1,78 @@
 import SideBar from '../ui/SideBar'
 import AdminHeader from '../ui/AdminHeader'
-import SongIcon from '../svgs/SongIcon'
-import LLMBlockListIcon from '../svgs/LLMBlockListIcon'
-import StoryIcon from '../svgs/StoryIcon'
-import { Link } from 'react-router-dom'
 import { blocklistData } from './data/blockListData'
 import Pagination from '../ui/Pagination'
 import LLMList from './components/LLMList'
-
+import { useState } from 'react'
+import PromptTabs from './PromptTabs';
 export default function StoryPrompts() {
+    const [showAddForm, setShowAddForm] = useState(false)
+    const [newWord, setNewWord] = useState('')
+    const handleSave = () => {
+        if (!newWord.trim()) return
+        console.log('Save new blocked word:', newWord)
+        setNewWord('')
+        setShowAddForm(false)
+    }
     return (
         <div className="flex items-start justify-center bg-[#F9F9F9]">
             <SideBar />
             <div className='w-full pb-4'>
                 <AdminHeader />
-                <div className='mt-6    px-6'>
-                    <div className='flex items-center justify-start gap-6 border-b-[1px] border-[#E5E7EB] '>
-                        <div className='flex items-center justify-center gap-[10px] py-3 border-b-[2px] border-b-[#9458E8]'>
-                            <StoryIcon color='' />
-                            <Link to={`/dashboard/story-prompts`} className='font-[700] text-[11.9px] leading-[20px] text-[#9458E8] inter-font cursor-pointer'>Story</Link>
-                        </div>
-                        <div className='flex items-center justify-center gap-[10px] py-3'>
-                            <SongIcon color='' />
-                            <Link to={`/dashboard/audio-prompts`} className='font-[700] text-[11.9px] leading-[20px] text-[#6B7280] inter-font cursor-pointer'>Music</Link>
-                        </div>
-                        <div className='flex items-center justify-center gap-[10px] py-3'>
-                            <LLMBlockListIcon />
-                            <Link to={`/dashboard/llm-blocklist-prompts`} className='font-[700] text-[11.9px] leading-[20px] text-[#6B7280] inter-font cursor-pointer'>LLM Blocklist</Link>
-                        </div>
-                    </div>
+                <div className='mt-6 px-6'>
+                    <PromptTabs />
                 </div>
                 <div className='mt-6 px-6'>
                     <div className='flex items-center justify-between'>
-                        <h1 className='text-[#1F2937] text-[15.3px] leading-[28px] font-[600]'>AI LLM Blocklist</h1>
-                        <div className='flex items-center justify-center py-[8px] px-[16px] gap-2 cursor-pointer rounded-[6px]' style={{background: "linear-gradient(to right, #9458E8, #CA00E5)"}}>
+                        <h1 className='text-[#1F2937] font-semibold text-[15.3px] leading-[28px]  text-xl'>AI LLM Blocklist</h1>
+                        <div
+                            className='flex items-center justify-center py-[8px] px-[16px] gap-2 cursor-pointer rounded-[6px]'
+                            style={{ background: "linear-gradient(to right, #9458E8, #CA00E5)" }}
+                            onClick={() => setShowAddForm(!showAddForm)}
+                        >
                             <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3.677 8.5H13.0103" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 <path d="M8.34375 3.83331V13.1666" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
-                            <button className='text-[11.9px] leading-[20px] font-[400] text-[#FFFFFF] cursor-pointer'>Add Blocked Word</button>
+                            <span className='text-[11.9px] leading-[20px] font-[400] text-[#FFFFFF] cursor-pointer  bg-gradient-to-r from-[#9458E8] via-[#A43EE7] to-[#CA00E5]'>Add Blocked Word</span>
                         </div>
                     </div>
                 </div>
+                {showAddForm && (
+                    <div className='px-6 mt-4'>
+                        <div className='bg-white p-6 rounded-[8px] border-[1px] border-[#E5E7EB]'>
+                            <h3 className='font-[600] text-[14px] leading-[24px] text-[#1F2937]'>Add New LLM Blockword</h3>
+                            <p className='mt-1 font-[400] text-[11.9px] leading-[20px] text-[#4B5563]'>Write the Word</p>
+                            <input
+                                type='text'
+                                value={newWord}
+                                onChange={(e) => setNewWord(e.target.value)}
+                                placeholder='Enter blocked word'
+                                className='w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg text-[11.9px] leading-[20px] focus:outline-none focus:ring-2 focus:ring-purple-400'
+                            />
+                            <div className='flex items-center justify-end gap-4 mt-4'>
+                                <button
+                                    onClick={() => { setShowAddForm(false); setNewWord('') }}
+                                    className='px-4 py-2 border border-[#9458E8] rounded-[6px] text-[#000000] text-[11.9px] leading-[20px]'
+                                >
+                                    Close
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    className='px-4 py-2 rounded-[6px] text-white text-[11.9px] leading-[20px]'
+                                    style={{ background: "linear-gradient(to right, #9458E8, #CA00E5)" }}
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <div className='px-6 mt-6 '>
                     <div className='bg-white p-6 rounded-[8px] border-[1px] border-[#E5E7EB]'>
-                        <p className='font-[400] text-[11.9px] leading-[20px] text-[#4B5563] inter-font'>These words will be blocked from appearing in any content generated by the AI. The blocklist is applied to all story and song generations.</p>
+                        <p className='font-[400] text-[11.9px] leading-[20px] text-[#4B5563] inter-font'>
+                            These words will be blocked from appearing in any content generated by the AI. The blocklist is applied to all story and song generations.
+                        </p>
                     </div>
                 </div>
                 <div className='mt-6 px-6'>
@@ -59,13 +87,11 @@ export default function StoryPrompts() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {
-                                        blocklistData.map((block, index) => (
-                                            <tr key={index}>
-                                                <LLMList  block={block} />
-                                            </tr>
-                                        ))
-                                    }
+                                    {blocklistData.map((block, index) => (
+                                        <tr key={index} className=" ">
+                                            <LLMList block={block} />
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>

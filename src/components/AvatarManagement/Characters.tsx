@@ -1,8 +1,9 @@
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import Pagination from "../ui/Pagination";
 import AddAvatarModal from "./AddAvatarModalProps";
 import { useState, useEffect } from "react";
 import api from "@/Context/api";
+import { toast } from "react-toastify";
 interface Character {
     _id: string;
     title: string;
@@ -23,7 +24,9 @@ export default function Characters() {
         setLoading(true);
         try {
             const res = await api.get("/api/characters");
-            const filtered = res.data.data.characters.filter((c: Character) => c.icon);
+            const filtered = res.data.data.characters.filter(
+                (c: Character) => c.icon
+            );
             setCharacters(filtered);
         } catch (err) {
             console.error("Failed to fetch characters", err);
@@ -34,9 +37,20 @@ export default function Characters() {
     useEffect(() => {
         fetchCharacters();
     }, []);
-    const handleSaveCharacter = async () => {
-        await fetchCharacters();
-        setIsModalOpen(false);
+
+    // const handleSaveCharacter = async () => {
+    //     await fetchCharacters();
+    //     setIsModalOpen(false);
+    // };
+    const handleDelete = async (id: string) => {
+        try {
+            await api.delete(`/api/characters/${id}`);
+            setCharacters(prev => prev.filter(item => item._id !== id));
+            toast.success("Item deleted successfully!");
+        } catch (err) {
+            console.error("Delete failed", err);
+            toast.error("Failed to delete item");
+        }
     };
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -44,7 +58,9 @@ export default function Characters() {
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-[#4B5563]">Characters Avatars</h2>
+                <h2 className="text-lg font-semibold text-[#4B5563]">
+                    Characters Avatars
+                </h2>
                 <button
                     className="flex items-center gap-2 bg-gradient-to-r from-[#9458E8] via-[#A43EE7] to-[#CA00E5] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                     onClick={() => setIsModalOpen(true)}
@@ -58,26 +74,44 @@ export default function Characters() {
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
                     {currentItems.map((item) => (
-                        <div key={item._id} className="flex flex-col items-center gap-2">
+                        <div key={item._id} className="flex flex-col items-center gap-2 group">
                             <div
-                                className="w-32 h-32 aspect-square rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-transform shadow-sm border border-gray-200"
+                                className="relative w-32 h-32 aspect-square rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-transform shadow-sm border border-gray-200 flex items-center justify-center"
                                 style={{
                                     background: item.colors?.length
                                         ? `linear-gradient(90deg,
-                                    ${normalizeColor(item.colors[0])} 0%,
-                                    ${normalizeColor(item.colors[1] || item.colors[0])} 50%,
-                                    ${normalizeColor(item.colors[2] || item.colors[0])} 100%)`
+                                        ${normalizeColor(item.colors[0])} 0%,
+                                        ${normalizeColor(item.colors[1] || item.colors[0])} 50%,
+                                        ${normalizeColor(item.colors[2] || item.colors[0])} 100%)`
                                         : "#f3f3f3"
                                 }}
                             >
+                                <button
+                                    onClick={() => handleDelete(item._id)}
+                                    className="
+                                        absolute top-2 right-2 z-10
+                                        w-8 h-8 rounded-full
+                                        bg-white/70 backdrop-blur
+                                        flex items-center justify-center
+                                        opacity-0 group-hover:opacity-100
+                                        transition-all duration-200
+                                        hover:bg-red-50 hover:scale-110
+                                        shadow-sm
+                                    "
+                                    title="Delete"
+                                >
+                                    <Trash2 size={14} className="text-red-500" />
+                                </button>
                                 <img
                                     src={item.icon!}
                                     alt={item.title}
-                                    className="w-28 h-28 mt-5 object-cover"
+                                    className="w-full h-full object-contain p-4"
                                 />
                             </div>
-                            <p className="text-xs text-center text-[#4B5563] font-medium">{item.title}</p>
 
+                            <p className="text-xs text-center text-[#4B5563] font-medium">
+                                {item.title}
+                            </p>
                         </div>
                     ))}
                 </div>
@@ -93,7 +127,7 @@ export default function Characters() {
                 onClose={() => setIsModalOpen(false)}
                 apiEndpoint="/api/characters"
                 categoryName="Character"
-                onSave={handleSaveCharacter}
+                onSave={(data) => setCharacters(prev => [...prev, data])}
             />
         </div>
     );

@@ -35,10 +35,10 @@ export default function AvatarManagement() {
                 setCategories([
                     { name: 'Avatars', count: avatarsRes.data.data.avatars?.length || 0 },
                     { name: 'Story Type', count: storyRes.data.data.songTypes?.length || 0 },
-                    { name: 'Characters', count: charRes.data.data.characters?.filter((c:any)=>c.icon).length || 0 },
-                    { name: 'Places', count: placesRes.data.data.places?.filter((p:any)=>p.icon).length || 0 },
-                    { name: 'Items', count: itemsRes.data.data.items?.filter((i:any)=>i.icon).length || 0 },
-                    { name: 'Theme', count: themeRes.data.data.themes?.filter((t:any)=>t.icon).length || 0 },
+                    { name: 'Characters', count: charRes.data.data.characters?.filter((c: any) => c.icon).length || 0 },
+                    { name: 'Places', count: placesRes.data.data.places?.filter((p: any) => p.icon).length || 0 },
+                    { name: 'Items', count: itemsRes.data.data.items?.filter((i: any) => i.icon).length || 0 },
+                    { name: 'Theme', count: themeRes.data.data.themes?.filter((t: any) => t.icon).length || 0 },
                 ]);
 
             } catch (err) {
@@ -62,42 +62,70 @@ export default function AvatarManagement() {
     };
 
     return (
-        <section className="flex items-start justify-center bg-[#F9F9F9] relative">
+        <section className="flex items-start justify-center bg-[#F9F9F9] relative min-h-screen">
             <SideBar />
-            <div className='w-full pb-[24px]'>
+
+            <div className="w-full pb-[24px]">
                 <AdminHeader />
-                <div className='mt-6 px-6'>
+
+                <div className="mt-6 px-6">
+                    {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-2xl font-bold text-[#4B5563] mb-1">Avatar Management</h1>
-                        <p className="text-sm text-[#6B7280]">View and manage your Avatars</p>
+                        <h1 className="text-2xl font-bold text-[#374151]">
+                            Avatar Management
+                        </h1>
+                        <p className="text-sm text-[#6B7280]">
+                            Manage avatars, story types and assets
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                        {/* Categories Sidebar */}
+                        {/* Categories */}
                         <div className="lg:col-span-1">
-                            <div className="bg-[#FFFFFF] rounded-lg shadow border border-gray-200 p-5">
-                                <h2 className="text-md font-semibold text-[#4B5563] mb-4">Categories</h2>
-                                <div className="space-y-1">
-                                    {categories.map((category, index) => (
-                                        <div
-                                            key={index}
-                                            onClick={() => setSelectedCategory(category.name)}
-                                            className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-[24px] cursor-pointer transition-colors text-[#4B5563] ${selectedCategory === category.name
-                                                    ? 'bg-purple-50 text-[#9458E8]'
-                                                    : 'text-[#4B5563] hover:bg-gray-50'
-                                                }`}
-                                        >
-                                            <span className="text-sm font-medium">{category.name}</span>
-                                            <span className={`text-xs font-semibold ${selectedCategory === category.name ? 'text-purple-600' : 'text-gray-400'}`}>
-                                                {category.count}
-                                            </span>
-                                        </div>
-                                    ))}
+                            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                                <h2 className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wide">
+                                    Categories
+                                </h2>
+                                <div className="space-y-2">
+                                    {categories.map((category, index) => {
+                                        const isActive = selectedCategory === category.name;
+                                        return (
+                                            <div
+                                                key={index}
+                                                onClick={() => setSelectedCategory(category.name)}
+                                                 className={`
+                                                group cursor-pointer rounded-lg px-3 py-3 flex items-center justify-between
+                                                transition-all duration-200
+                                                ${isActive
+                                                        ? "bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-[#9458E8]"
+                                                        : "hover:bg-gray-50"
+                                                    }
+                                              `}
+                                            >
+                                                <span
+                                                    className={`text-sm font-medium ${isActive ? "text-[#9458E8]" : "text-gray-700"
+                                                        }`}
+                                                >
+                                                    {category.name}
+                                                </span>
+
+                                                <span
+                                                    className={`text-xs font-semibold px-2 py-0.5 rounded-full
+                                                      ${isActive
+                                                            ? "bg-[#9458E8] text-white"
+                                                            : "bg-gray-100 text-gray-500 group-hover:bg-gray-200"
+                                                        }
+                                                       `}
+                                                >
+                                                    {category.count}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
-
-                        {/* Main Content */}
+                        {/* Content */}
                         <div className="lg:col-span-3">
                             {renderContent()}
                         </div>

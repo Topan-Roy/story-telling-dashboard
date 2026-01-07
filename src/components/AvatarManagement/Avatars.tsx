@@ -1,10 +1,11 @@
-
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import Pagination from "../ui/Pagination";
 import AddAvatarModal from "./AddAvatarModalProps";
 import { useState, useEffect } from "react";
 import api from "@/Context/api";
-interface Avatars {
+import { toast } from "react-toastify";
+
+interface Avatar {
     _id: string;
     title: string;
     icon: string | null;
@@ -12,17 +13,21 @@ interface Avatars {
     createdAt: string;
     updatedAt: string;
 }
+
 export default function Avatars() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [characters, setAvatars] = useState<Avatars[]>([]);
+    const [avatars, setAvatars] = useState<Avatar[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 12;
+
+    const normalizeColor = (color: string) => color.startsWith("#") ? color : `#${color}`;
+
     const fetchAvatars = async () => {
         setLoading(true);
         try {
             const res = await api.get("/api/characters");
-            const filtered = res.data.data.characters.filter((c: Avatars) => c.icon);
+            const filtered = res.data.data.characters.filter((c: Avatar) => c.icon);
             setAvatars(filtered);
         } catch (err) {
             console.error("Failed to fetch Avatars", err);
@@ -30,15 +35,33 @@ export default function Avatars() {
             setLoading(false);
         }
     };
+
     useEffect(() => {
         fetchAvatars();
     }, []);
-    const handleSaveAvatars = async () => {
-        await fetchAvatars;
+
+    const handleSaveAvatar = async () => {
+        await fetchAvatars();
+        setIsModalOpen(false);
     };
+
+    const handleDelete = async (id: string) => {
+
+
+        try {
+            await api.delete(`/api/characters/${id}`);
+            setAvatars(prev => prev.filter(item => item._id !== id));
+            toast.success("Item deleted successfully!");
+        } catch (err) {
+            console.error("Delete failed", err);
+            toast.error("Failed to delete item");
+        }
+    };
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = characters.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = avatars.slice(indexOfFirstItem, indexOfLastItem);
+
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
@@ -48,46 +71,72 @@ export default function Avatars() {
                     onClick={() => setIsModalOpen(true)}
                 >
                     <Plus size={18} />
-                    Add Character
+                    Add Avatar
                 </button>
             </div>
+
             {loading ? (
                 <p className="text-center mb-10 text-gray-500">Loading...</p>
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
                     {currentItems.map((item) => (
-                        <div key={item._id} className="flex flex-col items-center gap-2">
+                        <div key={item._id} className="flex flex-col items-center gap-2 group">
                             <div
-                                className="w-32 h-32 aspect-square rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-transform shadow-sm border border-gray-200"
+                                className="relative w-32 h-32 aspect-square rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-transform shadow-sm border border-gray-200 flex items-center justify-center"
                                 style={{
                                     background: item.colors.length
-                                        ? `linear-gradient(135deg, #${item.colors[0]} 0%, #${item.colors[1] || item.colors[0]} 50%, #${item.colors[2] || item.colors[0]} 100%)`
+                                        ? `linear-gradient(135deg,
+                                        ${normalizeColor(item.colors[0])} 0%,
+                                        ${normalizeColor(item.colors[1] || item.colors[0])} 50%,
+                                        ${normalizeColor(item.colors[2] || item.colors[0])} 100%)`
                                         : "#f3f3f3",
                                 }}
                             >
+                                {/* Delete Icon */}
+                                <button
+                                    onClick={() => handleDelete(item._id)}
+                                    className="
+                                        absolute top-2 right-2 z-10
+                                        w-8 h-8 rounded-full
+                                        bg-white/70 backdrop-blur
+                                        flex items-center justify-center
+                                        opacity-0 group-hover:opacity-100
+                                        transition-all duration-200
+                                        hover:bg-red-50 hover:scale-110
+                                        shadow-sm
+                                    "
+                                    title="Delete"
+                                >
+                                    <Trash2 size={14} className="text-red-500" />
+                                </button>
+
+                                {/* Item Icon */}
                                 <img
                                     src={item.icon!}
                                     alt={item.title}
-                                    className="w-28 h-28 mt-5 object-cover"
+                                    className="w-full h-full object-contain p-4"
                                 />
                             </div>
+
                             <p className="text-xs text-center text-[#4B5563] font-medium">{item.title}</p>
                         </div>
                     ))}
                 </div>
             )}
+
             <Pagination
-                totalItems={characters.length}
+                totalItems={avatars.length}
                 itemsPerPage={itemsPerPage}
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
             />
+
             <AddAvatarModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 apiEndpoint="/api/characters"
-                categoryName="Avatars"
-                onSave={handleSaveAvatars}
+                categoryName="Avatar"
+                onSave={handleSaveAvatar}
             />
         </div>
     );

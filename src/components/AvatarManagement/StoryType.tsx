@@ -4,7 +4,6 @@ import AddAvatarModal from "./AddAvatarModalProps";
 import { useState, useEffect } from "react";
 import api from "@/Context/api";
 import { toast } from "react-toastify";
-
 interface SongType {
     _id: string;
     title: string;
@@ -13,14 +12,12 @@ interface SongType {
     createdAt: string;
     updatedAt: string;
 }
-
 export default function StoryType() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [songTypes, setSongTypes] = useState<SongType[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 12;
-
     useEffect(() => {
         const fetchSongTypes = async () => {
             setLoading(true);
@@ -37,11 +34,9 @@ export default function StoryType() {
         };
         fetchSongTypes();
     }, []);
-
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = songTypes.slice(indexOfFirstItem, indexOfLastItem);
-
     const handleDelete = async (id: string) => {
         try {
             await api.delete(`/api/song-types/${id}`);
@@ -52,9 +47,7 @@ export default function StoryType() {
             toast.error("Failed to delete item");
         }
     };
-
     const normalizeColor = (color: string) => color.startsWith("#") ? color : `#${color}`;
-
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
@@ -67,7 +60,6 @@ export default function StoryType() {
                     Add Story Type
                 </button>
             </div>
-
             {loading ? (
                 <p className="text-center mb-10 text-gray-500">Loading...</p>
             ) : (
@@ -104,8 +96,6 @@ export default function StoryType() {
                                 >
                                     <Trash2 size={14} className="text-red-500" />
                                 </button>
-
-                                {/* Item Icon */}
                                 <img
                                     src={item.icon!}
                                     alt={item.title}
@@ -119,14 +109,12 @@ export default function StoryType() {
                     ))}
                 </div>
             )}
-
             <Pagination
                 totalItems={songTypes.length}
                 itemsPerPage={itemsPerPage}
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}
             />
-
             <AddAvatarModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

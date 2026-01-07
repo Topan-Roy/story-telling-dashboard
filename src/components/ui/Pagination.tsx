@@ -19,19 +19,14 @@ interface PaginationProps {
   currentPage: number;
   onPageChange: (page: number) => void;
 }
-
 export default function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange }: PaginationProps) {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-
   const handlePrevious = () => {
     if (currentPage > 1) onPageChange(currentPage - 1);
   };
-
   const handleNext = () => {
     if (currentPage < totalPages) onPageChange(currentPage + 1);
   };
-
-  // For simplicity, show max 5 pages at a time
   const getPageNumbers = () => {
     const pages = [];
     let start = Math.max(1, currentPage - 2);
@@ -40,7 +35,6 @@ export default function Pagination({ totalItems, itemsPerPage, currentPage, onPa
     for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   };
-
   return (
     <div className='p-6 border-t-[1px] border-[#E5E7EB] flex items-center justify-between'>
       <p className='font-[400] text-[11.9px] leading-[20px] text-[#9458E8] inter-font'>
@@ -54,7 +48,6 @@ export default function Pagination({ totalItems, itemsPerPage, currentPage, onPa
         >
           Previous
         </button>
-
         {getPageNumbers().map((page) => (
           <button
             key={page}
@@ -69,7 +62,6 @@ export default function Pagination({ totalItems, itemsPerPage, currentPage, onPa
             {page}
           </button>
         ))}
-
         <button
           className='border-[1px] border-[#A43EE7] cursor-pointer rounded-[6px] px-4 py-1 text-[#727273]'
           onClick={handleNext}

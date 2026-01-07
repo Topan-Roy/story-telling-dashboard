@@ -81,7 +81,7 @@ export default function App() {
 
         <Route path='/dashboard/audio-prompts' element={<AudioPrompts />} />
 
-        <Route path='/dashboard/avatar-management' element={<AvatarManagement />} />
+        <Route path='/dashboard/avatar-management' element={<PrivateRoute><AvatarManagement /></PrivateRoute>} />
         <Route path='/dashboard/llm-blocklist-prompts' element={<LLMBlockList />} />
 
         <Route path='/dashboard/llm-prompts' element={<StoryPrompts />} />

@@ -84,7 +84,7 @@ export default function AvatarManagement() {
                                             onClick={() => setSelectedCategory(category.name)}
                                             className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-[24px] cursor-pointer transition-colors text-[#4B5563] ${selectedCategory === category.name
                                                     ? 'bg-purple-50 text-[#9458E8]'
-                                                    : 'text-gray-700 hover:bg-gray-50'
+                                                    : 'text-[#4B5563] hover:bg-gray-50'
                                                 }`}
                                         >
                                             <span className="text-sm font-medium">{category.name}</span>

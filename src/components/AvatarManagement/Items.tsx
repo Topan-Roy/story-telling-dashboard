@@ -66,7 +66,7 @@ export default function Items() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-[#4B5563]">Items Avatars</h2>
         <button
-          className="flex items-center gap-2 bg-gradient-to-r from-[#9458E8] via-[#A43EE7] to-[#CA00E5] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex cursor-pointer items-center gap-2 bg-gradient-to-r from-[#9458E8] via-[#A43EE7] to-[#CA00E5] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           onClick={() => setIsModalOpen(true)}
         >
           <Plus size={18} />

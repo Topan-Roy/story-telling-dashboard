@@ -1,8 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SideBar from '../ui/SideBar';
 import AdminHeader from '../ui/AdminHeader';
 import PromptTabs from './PromptTabs';
+import api from '@/Context/api';
+import { toast } from 'react-toastify';
+interface PromptData {
+  _id: string;
+  promptKey: string;
+  systemPrompt: string;
+  variables: string[];
+  createdAt: string;
+  updatedAt: string;
+}
 export default function StoryPrompts() {
+  const [promptData, setPromptData] = useState<PromptData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedPrompt, setEditedPrompt] = useState('');
+  useEffect(() => {
+    fetchPromptData();
+  }, []);
+  const fetchPromptData = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/api/prompts/story_idea');
+      setPromptData(response.data.data.prompt);
+      setEditedPrompt(response.data.data.prompt.systemPrompt);
+    } catch (error) {
+      console.error('Failed to fetch prompt data:', error);
+      toast.error('Failed to load prompt data');
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleSave = async () => {
+    if (!promptData) return;
+    try {
+      await api.patch('/api/prompts/story_idea', {
+        systemPrompt: editedPrompt
+      });
+      toast.success('Prompt updated successfully!');
+      setIsEditing(false);
+      fetchPromptData();
+    } catch (error) {
+      console.error('Failed to update prompt:', error);
+      toast.error('Failed to update prompt');
+    }
+  };
+  const handleCancel = () => {
+    setEditedPrompt(promptData?.systemPrompt || '');
+    setIsEditing(false);
+  };
   return (
     <div className="flex items-start justify-center bg-[#F9F9F9]">
       <SideBar />
@@ -20,112 +68,84 @@ export default function StoryPrompts() {
                   View and manage all your Story Master Prompts
                 </p>
               </div>
-              <button className="flex items-center mt-4 gap-2 bg-gradient-to-r from-[#9458E8] via-[#A43EE7] to-[#CA00E5] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90">
+              <button className="flex items-center mt-4 gap-2 bg-gradient-to-r from-[#9458E8] via-[#A43EE7] to-[#CA00E5] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 cursor-pointer">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M8 3.5V12.5M3.5 8H12.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M8 3.5V12.5M3.5 8H12.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
                 Add Prompt
               </button>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm font-semibold text-[#4B5563]">
-                    SYSTEM PROMPT:
-                  </h2>
-                  <div className="flex items-center gap-2">
-                    <button className="p-1.5 hover:bg-gray-100 rounded">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M11.333 2L14 4.667l-9.333 9.333H2v-2.667L11.333 2z" stroke="#9333EA" strokeWidth="1.2"/>
-                      </svg>
-                    </button>
-                    <button className="p-1.5 hover:bg-gray-100 rounded">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M2 4h12M6.5 7v5M9.5 7v5M3 4l1 9.5A1.5 1.5 0 005.5 15h5a1.5 1.5 0 001.5-1.5L13 4" stroke="#EF4444" strokeWidth="1.2"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <p className="text-sm text-[#4B5563] leading-relaxed mb-6">
-                  You are Koko, a friendly, imaginative, and talented master singer-songwriter who creates fun, positive, and age-appropriate songs for children. Your purpose is to craft a unique, personalized, and memorable song experience using the details provided by the user.
-                </p>
-
-                <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-[#4B5563] mb-2">Inputs Provided</h3>
-                  <div className="text-sm text-gray-600 space-y-0.5">
-                    <p>Child's Age: (age)</p>
-                    <p>Child's Name (optional): (child_name)</p>
-                    <p>Song Type / Genre: (song_type)</p>
-                    <p>Theme: (theme)</p>
-                    <p>Characters to Include: (characters_list)</p>
-                    <p>Places to Feature: (places_list)</p>
-                    <p>Key Items to Include: (items_list)</p>
-                    <p>Song Length (in minutes): (song_length_minutes)</p>
-                    <p>Excluded Words: (excluded_words_list)</p>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-[#4B5563] mb-3">Creative Process</h3>
-                  
-                  <div className="space-y-4 text-sm">
-                    <div>
-                      <p className="font-medium text-[#4B5563] mb-1.5">Step 1 – Character & Story Foundation</p>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 leading-relaxed">
-                        <li>Use (child_name) (when provided) as the main character; if given, otherwise, create a suitable, age-appropriate character.</li>
-                        <li>Build a simple story or adventure that reflects the (theme) through actions and discovery, not direct moral statements.</li>
-                        <li>The story must have a positive or uplifting outcome.</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#4B5563] mb-1.5">Step 2 – Genre & Tone Adaptation</p>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 leading-relaxed">
-                        <li>Adapt (song_type) to be fun, safe, and child-friendly.</li>
-                        <li>"Spooky" = playful mystery, not fear.</li>
-                        <li>"Adventure" = exploration and teamwork, not danger.</li>
-                        <li>Keep rhythm, rhyme, and structure suited to a song lasting about (song_length_minutes) minutes (±15 seconds).</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#4B5563] mb-1.5">Step 3 – Integrate All Elements</p>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 leading-relaxed">
-                        <li>Naturally weave every element from (characters_list), (places_list), and (items_list) into a coherent narrative-song.</li>
-                        <li>Ensure all appear in ways that make sense within the lyrics.</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#4B5563] mb-1.5">Step 4 – Age & Language Filtering</p>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 leading-relaxed">
-                        <li>All lyrics must match the understanding level of a (age)-year-old child.</li>
-                        <li>Use simple, melodic, and cheerful phrasing.</li>
-                        <li>Avoid sarcasm, negativity, or complex metaphors.</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#4B5563] mb-1.5">Step 5 – Positive & Safe Content Rules (Prime Directive)</p>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 leading-relaxed">
-                        <li>Absolutely exclude all words in (excluded_words_list), including variations.</li>
-                        <li>Conflicts must always be resolved with creativity, teamwork, or kindness.</li>
-                        <li>No real-world threats, violence, or fear. Focus on imagination, fun, and discovery.</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#4B5563] mb-1.5">Step 6 – Title & Cover Art (Standard Output)</p>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 leading-relaxed">
-                        <li>Create a short, catchy, child-appropriate song title.</li>
-                        <li>Generate a vivid image describing a bright, imaginative cover that matches the song's theme, characters, and setting.</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#4B5563] mb-1.5">Final Style Notes</p>
-                      <ul className="list-disc pl-5 space-y-1 text-[#4B5563] leading-relaxed">
-                        <li>Write as Koko, a warm, imaginative musical companion.</li>
-                        <li>Every song should be positive, rhythmic, emotionally engaging, and suitable for the given age.</li>
-                      </ul>
-                    </div>
-                  </div>
+            {loading ? (
+              <div className="bg-white border border-gray-200 rounded-lg p-12">
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="bg-white border border-gray-200 rounded-lg">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-semibold text-[#4B5563]">
+                      SYSTEM PROMPT:
+                    </h2>
+                    <div className="flex items-center gap-2">
+                      {!isEditing ? (
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="p-1.5 hover:bg-gray-100 rounded cursor-pointer"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M11.333 2L14 4.667l-9.333 9.333H2v-2.667L11.333 2z" stroke="#9333EA" strokeWidth="1.2" />
+                          </svg>
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handleSave}
+                            className="px-3 py-1.5 bg-green-600 text-white text-xs rounded hover:bg-green-700 cursor-pointer"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={handleCancel}
+                            className="px-3 py-1.5 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300 cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {isEditing ? (
+                    <textarea
+                      value={editedPrompt}
+                      onChange={(e) => setEditedPrompt(e.target.value)}
+                      className="w-full h-[600px] p-4 text-sm text-[#4B5563] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Enter system prompt..."
+                    />
+                  ) : (
+                    <div className="text-sm text-[#4B5563] leading-relaxed whitespace-pre-wrap">
+                      {promptData?.systemPrompt}
+                    </div>
+                  )}
+                  {promptData?.variables && promptData.variables.length > 0 && (
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <h3 className="text-sm font-semibold text-[#4B5563] mb-3">Variables Used:</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {promptData.variables.map((variable, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-purple-50 text-purple-700 text-xs rounded-full border border-purple-200"
+                          >
+                            {variable}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
